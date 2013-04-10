@@ -130,7 +130,7 @@
 
 		A: 0, X: 0, Y: 0, S: 32 /* bit 5 set */, SP: 0, PC: 0,
 		opcode: 0, opcode_name: '', opcode_cycle: 0, addr_mode: '',
-		operand: 0,
+		operand: 0, instruction_addr: 0,
 
 		reset: function() {
 			this.A = this.X = this.Y = 0;
@@ -145,20 +145,66 @@
 		},
 
 		set_nz: function(result) {
+
+			// 128 N Negative
+			// 64  V Overflow
+			// 32  – ignored
+			// 16  B Break
+			// 8   D Decimal
+			// 4   I Interrupt (IRQ disable)
+			// 2   Z Zero
+			// 1   C Carry
+
+			// Zero flag
 			if(result === 0) {
-				this.S &= 2;
+				this.S |= 2;
 			}
 			else {
-				this.S ^= 2;
+				this.S &= ~2;
+			}
+
+			if(result & 128) {
+				this.S |= 128;
+			}
+			else {
+				this.S &= ~128;
 			}
 		},
 
 		tick: function() {
 
+			function format_operand(operand, addr_mode) {
+				switch(addr_mode) {
+					case 'implied':
+						return '';
+					case 'immediate':
+						return '#' + operand.toString(16);
+					case 'absolute':
+					case 'zeropage':
+						return '$' + operand.toString(16);
+					case 'absolute,x':
+					case 'zeropage,x':
+						return '$' + operand.toString(16) + ',X';
+					case 'absolute,y':
+					case 'zeropage,y':
+						return '$' + operand.toString(16) + ',Y';
+					case 'relative':
+						return '*+' + operand.toString(10);
+					case 'indirect':
+						return '(' + operand.toString(16) + ')';
+					case 'indexedindirect':
+						return '(' + operand.toString(16) + ',X)';
+					case 'indirectindexed':
+						return '(' + operand.toString(16) + '),Y';
+					default:
+						throw new Error('Cannot format invalid address mode ' + addr_mode);
+				}
+			}
+
 			if(this.opcode_cycle === 0) {
-				this.opcode = read_byte(this.PC);
+				this.instruction_addr = this.PC;
+				this.opcode = read_byte(this.instruction_addr);
 				this.addr_mode = 'immediate';
-				console.log("Read opcode " + this.opcode.toString(16) + ' (' + this.opcode.toString(2) + ") from location " + this.PC);
 				this.PC += 1;
 				this.opcode_cycle += 1;
 				return;
@@ -196,11 +242,11 @@
 				case 0x88:
 					this.opcode_name = 'DEY';
 					this.addr_mode = 'implied';
-					if(this.opcode_cycle == 1) {
+					if(this.opcode_cycle === 1) {
 						this.Y -= 1;
 						this.set_nz(this.Y);
-						this.opcode_done = true;
-					}					
+						opcode_done = true;
+					}
 					break;
 				case 0xa8:
 					this.opcode_name = 'TAY';
@@ -209,20 +255,20 @@
 				case 0xc8:
 					this.opcode_name = 'INY';
 					this.addr_mode = 'implied';
-					if(this.opcode_cycle == 1) {
+					if(this.opcode_cycle === 1) {
 						this.Y += 1;
 						this.set_nz(this.Y);
-						this.opcode_done = true;
+						opcode_done = true;
 					}
 					break;
 				case 0xe8:
 					this.opcode_name = 'INX';
 					this.addr_mode = 'implied';
-					if(this.opcode_cycle == 1) {
+					if(this.opcode_cycle === 1) {
 						this.X += 1;
 						this.set_nz(this.X);
-						this.opcode_done = true;
-					}					
+						opcode_done = true;
+					}
 					break;
 				case 0x18:
 					this.opcode_name = 'CLC';
@@ -281,10 +327,10 @@
 				case 0xca:
 					this.opcode_name = 'DEX';
 					this.addr_mode = 'implied';
-					if(this.opcode_cycle == 1) {
+					if(this.opcode_cycle === 1) {
 						this.X -= 1;
 						this.set_nz(this.X);
-						this.opcode_done = true;
+						opcode_done = true;
 					}
 					break;
 				case 0xea:
@@ -295,6 +341,15 @@
 				case 0x10:
 					this.opcode_name = 'BPL';
 					this.addr_mode = 'implied';
+					if(this.opcode_cycle === 1) {
+						this.operand = read_byte(this.PC);
+						this.PC += 1;
+						if(this.S & 128) {
+							console.log('Branching ahead ' + this.operand + ' bytes');
+							this.PC += this.operand;
+						}
+						opcode_done = true;
+					}
 					break;
 				case 0x30:
 					this.opcode_name = 'BMI';
@@ -323,7 +378,7 @@
 				case 0xf0:
 					this.opcode_name = 'BEQ';
 					this.addr_mode = 'implied';
-					if(this.opcode_cycle == 1) {
+					if(this.opcode_cycle === 1) {
 						this.operand = read_byte(this.PC);
 						this.PC += 1;
 						if(this.S & 2) {
@@ -339,7 +394,7 @@
 							switch(bbb) {
 								case 0:
 									this.addr_mode = 'immediate';
-									if(this.opcode_cycle == 1) {
+									if(this.opcode_cycle === 1) {
 										this.operand = read_byte(this.PC);
 										this.PC += 1;
 									}
@@ -349,10 +404,10 @@
 									break;
 								case 3:
 									this.addr_mode = 'absolute';
-									if(this.opcode_cycle == 1) {
+									if(this.opcode_cycle === 1) {
 										this.operand = read_word(this.PC);
 										this.PC += 2;
-									}				
+									}
 									break;
 								case 5:
 									this.addr_mode = 'zeropage,x';
@@ -390,7 +445,7 @@
 									this.opcode_name = 'LDY';
 									switch(this.addr_mode) {
 										case 'immediate':
-											if(this.opcode_cycle == 1) {
+											if(this.opcode_cycle === 1) {
 												this.Y = this.operand;
 												this.set_nz(this.Y);
 												opcode_done = true;
@@ -416,14 +471,14 @@
 									break;
 								case 2:
 									this.addr_mode = 'immediate';
-									if(this.opcode_cycle == 1) {
+									if(this.opcode_cycle === 1) {
 										this.operand = read_byte(this.PC);
 										this.PC += 1;
 									}
 									break;
 								case 3:
 									this.addr_mode = 'absolute';
-									if(this.opcode_cycle == 1) {
+									if(this.opcode_cycle === 1) {
 										this.operand = read_word(this.PC);
 										this.PC += 2;
 									}
@@ -436,6 +491,10 @@
 									break;
 								case 6:
 									this.addr_mode = 'absolute,y';
+									if(this.opcode_cycle === 1) {
+										this.operand = read_word(this.PC + this.Y);
+										this.PC += 2;
+									}
 									break;
 								case 7:
 									this.addr_mode = 'absolute,x';
@@ -465,26 +524,37 @@
 												opcode_done = true;
 											}
 											break;
-									}									
+										case 'absolute,y':
+											if(this.opcode_cycle === 5) {
+												write_byte(this.operand, this.A);
+												opcode_done = true;
+											}
+											break;
+									}
 									break;
 								case 5:
 									this.opcode_name = 'LDA';
 									switch(this.addr_mode) {
 										case 'immediate':
-											if(this.opcode_cycle == 1) {
+											if(this.opcode_cycle === 1) {
 												this.A = this.operand;
 												this.set_nz(this.A);
 												opcode_done = true;
 											}
 											break;
+										case 'absolute':
+											if(this.opcode_cycle === 4) {
+												this.A = read_byte(this.operand);
+												this.set_nz(this.A);
+												opcode_done = true;
+											}
 									}
 									break;
 								case 6:
 									this.opcode_name = 'CMP';
 									switch(this.addr_mode) {
 										case 'immediate':
-											if(this.opcode_cycle == 1) {
-												console.log('Comparing ' + this.A + ' to ' + this.operand);
+											if(this.opcode_cycle === 1) {
 												this.set_nz(this.A - this.operand);
 												opcode_done = true;
 											}
@@ -500,10 +570,11 @@
 						case 3:
 							throw new Error('Invalid opcode ' + this.opcode.toString(2) + ' at address ' + this.PC);
 					}
-				
+
 			}
-			
-			console.log('Processed opcode ' + this.opcode_name + ' address mode ' + this.addr_mode + ' cycle ' + this.opcode_cycle);
+
+			// console.log('Processed opcode ' + this.opcode_name + ' address mode ' + this.addr_mode + ' cycle ' + this.opcode_cycle);
+			console.log('$' + this.instruction_addr.toString(16).toUpperCase() + ' ' + this.opcode_name + ' ' + format_operand(this.operand, this.addr_mode) + '(' + this.opcode_cycle + ')');
 			document.getElementById('status_z').innerHTML = (this.S & 2) ? '1' : '0';
 			if(opcode_done) {
 				this.opcode_cycle = 0;
@@ -521,7 +592,7 @@
 				cpu.reset();
 			}
 			else {
-				cpu.tick();	
+				cpu.tick();
 			}
 		}
 		else {
@@ -529,6 +600,6 @@
 		}
 	};
 
-	setInterval(this.tick, 200);
+	setInterval(this.tick, 100);
 
 })();
