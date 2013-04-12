@@ -171,6 +171,17 @@
 			}
 		},
 
+		calculate_branch: function(operand) {
+			if(operand & 128) {
+				console.log('Branching backward ' + (~operand & 127) + ' bytes');
+				this.PC -= ((~operand & 127) + 1);
+			}
+			else {
+				console.log('Branching ahead ' + (operand & 127) + ' bytes');
+				this.PC += (operand & 127);
+			}
+		},
+
 		tick: function() {
 
 			function format_operand(operand, addr_mode) {
@@ -189,7 +200,13 @@
 					case 'zeropage,y':
 						return '$' + operand.toString(16) + ',Y';
 					case 'relative':
-						return '*+' + operand.toString(10);
+						if(operand & 128) {
+							return '*-' + (~operand & 127).toString(10);
+						}
+						else {
+							return '*+' + (operand & 127).toString(10);
+						}
+						break;
 					case 'indirect':
 						return '(' + operand.toString(16) + ')';
 					case 'indexedindirect':
@@ -340,13 +357,12 @@
 				// Conditional branches
 				case 0x10:
 					this.opcode_name = 'BPL';
-					this.addr_mode = 'implied';
+					this.addr_mode = 'relative';
 					if(this.opcode_cycle === 1) {
 						this.operand = read_byte(this.PC);
 						this.PC += 1;
-						if(this.S & 128) {
-							console.log('Branching ahead ' + this.operand + ' bytes');
-							this.PC += this.operand;
+						if(this.S ^ 128) {
+							this.calculate_branch(this.operand);
 						}
 						opcode_done = true;
 					}
@@ -382,8 +398,7 @@
 						this.operand = read_byte(this.PC);
 						this.PC += 1;
 						if(this.S & 2) {
-							console.log('Branching ahead ' + this.operand + ' bytes');
-							this.PC += this.operand;
+							this.calculate_branch(this.operand);
 						}
 						opcode_done = true;
 					}
@@ -484,7 +499,7 @@
 									}
 									break;
 								case 4:
-									this.addr_mode = 'zeropage,yindex';
+									this.addr_mode = 'zeropage,y';
 									break;
 								case 5:
 									this.addr_mode = 'zeropage,x';
