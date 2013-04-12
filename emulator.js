@@ -178,7 +178,7 @@
 					case 'implied':
 						return '';
 					case 'immediate':
-						return '#' + operand.toString(16);
+						return '#$' + operand.toString(16);
 					case 'absolute':
 					case 'zeropage':
 						return '$' + operand.toString(16);
