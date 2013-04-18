@@ -27,7 +27,7 @@
 
 	var ramX = generate_ram(4096);
 	var ramW = generate_ram(4096);
-	var pia = generate_ram(4096);
+	var pia = new PIA6821(this);
 	var romY, romY_data; load_rom('rom/monitor.rom');
 
 	this.read_word = function(addr) {
@@ -70,7 +70,7 @@
 				return 0;
 			case 13:
 				// PIA
-				return pia[bank_addr];
+				return pia.read(bank_addr & 3);
 			case 14:
 				// Banked RAM here to run BASIC
 				return ramW[bank_addr];
@@ -116,8 +116,7 @@
 				return 0;
 			case 13:
 				// PIA
-				pia[bank_addr] = value;
-				break;
+				return pia.write(bank_addr & 3, value);
 			case 14:
 				// Banked RAM here to run BASIC
 				ramW[bank_addr] = value;
