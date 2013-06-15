@@ -1,14 +1,14 @@
 <!doctype html>
 <html>
 <head>
-<script src="CPU6502.js" defer></script>
-<script src="PIA6821.js" defer></script>
-<script src="emulator.js" defer></script>
 </head>
 <body>
-	<h4>N</h4>
-	<p id="status_n"></p>
-	<h4>Z</h4>
-	<p id="status_z"></p>
+	<canvas width="640" height="480" id="screen">Really? A browser that doesn't support canvas? In 2013?</canvas>
+
+	<script src="CPU6502.js"></script>
+	<script src="PIA6821.js"></script>
+	<script src="screen.js"></script>
+	<script src="terminal.js"></script>
+	<script src="emulator.js" defer></script>
 </body>
 </html>

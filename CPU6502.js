@@ -684,7 +684,6 @@ function CPU6502(emulator) {
 
 		// console.log('Processed opcode ' + this.opcode_name + ' address mode ' + this.addr_mode + ' cycle ' + this.opcode_cycle);
 		console.log('$' + this.instruction_addr.toString(16).toUpperCase() + ' ' + this.opcode_name + ' ' + format_operand(this.operand, this.addr_mode) + '(' + this.opcode_cycle + ')');
-		document.getElementById('status_z').innerHTML = (this.S & 2) ? '1' : '0';
 		if(opcode_done) {
 			this.opcode_cycle = 0;
 		}
