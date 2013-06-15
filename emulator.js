@@ -128,6 +128,8 @@
 
 	};
 
+	this.screen = new screen(this);
+	this.terminal = new terminal(this);
 	this.cpu = new CPU6502(this);
 
 	var keyboard = (function() {
@@ -154,7 +156,7 @@
 	})();
 
 	this.tick = function() {
-		if(rom_loaded) {
+		if(rom_loaded && terminal.charmap_loaded) {
 			if(!cpu_initialized) {
 				cpu.reset();
 			}
