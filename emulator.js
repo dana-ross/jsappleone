@@ -91,7 +91,7 @@
 
 		var bank = Math.floor(addr / 4096);
 		var bank_addr = addr % 4096;
-		console.log('Writing value ' + value + ' to addr ' + bank_addr + ' in bank ' + bank);
+		console.log('Writing value ' + value + '($' + value.toString(16) + ') to addr ' + bank_addr + '($' + bank_addr.toString(16) + ') in bank ' + bank);
 
 		// TODO support memory remapping to support Woz's patching area
 		// see http://www.sbprojects.com/projects/apple1/a1block.php
@@ -131,8 +131,21 @@
 
 	var keyboard = (function() {
 
+		/**
+		 * Convert a lowercase keyCode to uppercase
+		 */
+		function uppercase(keyCode) {
+			// 97 = a, 65 = A
+			if(keyCode >= 97 && keyCode <= 122) {
+				return keyCode - 32;
+			}
+			// Fall through. Return what was passed.
+			return keyCode;
+		}
+
 		document.onkeypress = function(e) {
-			var key = e.keyCode ? e.keyCode : e.charCode;
+			var key = uppercase(e.keyCode ? e.keyCode : e.charCode);
+			console.log("ASCII code " + key);
 			write_byte(0xd011, 128);
 			write_byte(0xd010, (128 | (key & 127)));
 		};
