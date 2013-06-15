@@ -98,30 +98,40 @@ function CPU6502(emulator) {
 	 */
 	this.push_byte = function(value) {
 		emulator.write_byte(this.SP + 0x100, value);
-		this.SP += 1;
+		this.SP = (this.SP + 1) & 0xff;
 	};
 
 	/**
 	 * Push a word onto the stack
 	 */
 	this.push_word = function(value) {
-		emulator.write_byte(this.SP + 0x100, value & 0x00ff);
-		emulator.write_byte(this.SP + 0x100, value & 0xff00);
+		this.push_byte(value & 0x00ff);
+		this.push_byte((value & 0xff00) >> 8);
 	};
 
 	/**
 	 * Pop a value off the stack
 	 */
 	this.pop_byte = function() {
-		this.SP -= 1;
+		this.SP = (this.SP - 1) & 0xff;
 		return emulator.read_byte(this.SP + 0x100);
 	}
+
+	/**
+	 * Pop a word off the stack
+	 */
+	this.pop_word = function(value) {
+		var word = this.pop_byte() << 8;
+		word += this.pop_byte();
+		return word;
+	};
 
 	this.tick = function() {
 
 		function format_operand(operand, addr_mode) {
 			switch(addr_mode) {
 				case 'implied':
+				case 'accumulator':
 					return '';
 				case 'immediate':
 					return '#$' + operand.toString(16);
@@ -263,18 +273,34 @@ function CPU6502(emulator) {
 			case 0x8a:
 				this.opcode_name = 'TXA';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.A = this.X;
+					opcode_done = true;
+				}				
 				break;
 			case 0x9a:
 				this.opcode_name = 'TXS';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.SP = this.X;
+					opcode_done = true;
+				}				
 				break;
 			case 0xaa:
 				this.opcode_name = 'TAX';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.X = this.A;
+					opcode_done = true;
+				}
 				break;
 			case 0xba:
 				this.opcode_name = 'TSX';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.X = this.SP;
+					opcode_done = true;
+				}				
 				break;
 			case 0xca:
 				this.opcode_name = 'DEX';
@@ -289,7 +315,7 @@ function CPU6502(emulator) {
 				this.opcode_name = 'NOP';
 				this.addr_mode = 'implied';
 				break;
-			// Conditional branches & JSR
+			// Conditional branches & JSR/RTS
 			case 0x10:
 				this.opcode_name = 'BPL';
 				this.addr_mode = 'relative';
@@ -317,11 +343,28 @@ function CPU6502(emulator) {
 			case 0x30:
 				this.opcode_name = 'BMI';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.operand = emulator.read_byte(this.PC);
+					this.PC += 1;
+					if(this.S & 128) {
+						this.calculate_branch(this.operand);
+					}
+					opcode_done = true;
+				}
 				break;
 			case 0x50:
 				this.opcode_name = 'BVC';
 				this.addr_mode = 'implied';
 				break;
+			case 0x60:
+				this.opcode_name = 'RTS';
+				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 6) {
+					this.PC = this.pop_word();
+					console.log('Returning to ' + this.PC + '(' + this.PC.toString(16) + ')');
+					opcode_done = true;
+				}
+				break;				
 			case 0x70:
 				this.opcode_name = 'BVS';
 				this.addr_mode = 'implied';
@@ -337,6 +380,14 @@ function CPU6502(emulator) {
 			case 0xd0:
 				this.opcode_name = 'BNE';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.operand = emulator.read_byte(this.PC);
+					this.PC += 1;
+					if(this.S & 2) {
+						this.calculate_branch(this.operand);
+					}
+					opcode_done = true;
+				}				
 				break;
 			case 0xf0:
 				this.opcode_name = 'BEQ';
@@ -344,7 +395,7 @@ function CPU6502(emulator) {
 				if(this.opcode_cycle === 1) {
 					this.operand = emulator.read_byte(this.PC);
 					this.PC += 1;
-					if(this.S & 2) {
+					if(!(this.S & 2)) {
 						this.calculate_branch(this.operand);
 					}
 					opcode_done = true;
@@ -352,7 +403,7 @@ function CPU6502(emulator) {
 				break;
 			default:
 				switch(cc) {
-					case 0:
+					case 0: // cc = 00
 						switch(bbb) {
 							case 0:
 								this.addr_mode = 'immediate';
@@ -363,6 +414,10 @@ function CPU6502(emulator) {
 								break;
 							case 1:
 								this.addr_mode = 'zeropage';
+								if(this.opcode_cycle === 1) {
+									this.operand = emulator.read_byte(this.PC);
+									this.PC += 1;
+								}								
 								break;
 							case 3:
 								this.addr_mode = 'absolute';
@@ -443,13 +498,17 @@ function CPU6502(emulator) {
 								break;
 						}
 						break;
-					case 1:
+					case 1: // cc = 01
 						switch(bbb) {
 							case 0:
 								this.addr_mode = 'zeropage,x';
 								break;
 							case 1:
 								this.addr_mode = 'zeropage';
+									if(this.opcode_cycle === 1) {
+										this.operand = emulator.read_byte(this.PC);
+										this.PC += 1;
+									}																
 								break;
 							case 2:
 								this.addr_mode = 'immediate';
@@ -507,6 +566,7 @@ function CPU6502(emulator) {
 								this.opcode_name = 'STA';
 								switch(this.addr_mode) {
 									case 'absolute':
+									case 'zeropage':								
 										if(this.opcode_cycle == 3) {
 											emulator.write_byte(this.operand, this.A);
 											opcode_done = true;
@@ -518,6 +578,8 @@ function CPU6502(emulator) {
 											opcode_done = true;
 										}
 										break;
+									default:
+										throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + this.opcode.toString(2) + ' at address ' + this.PC);
 								}
 								break;
 							case 5:
@@ -537,6 +599,17 @@ function CPU6502(emulator) {
 											this.set_nz(this.A);
 											opcode_done = true;
 										}
+										break;
+									case 'absolute,y':
+										if(this.opcode_cycle === 4) {
+											this.A = emulator.read_byte((this.operand + this.Y) & 0xffff);
+											console.log('read ' + this.A + ' from ' + ((this.operand + this.Y) & 0xffff).toString(16));
+											this.set_nz(this.A);
+											opcode_done = true;
+										}
+										break;
+									default:
+										throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + opcode.toString(2) + ' at address ' + this.PC);
 								}
 								break;
 							case 6:
@@ -555,9 +628,56 @@ function CPU6502(emulator) {
 							default:
 						}
 						break;
-					case 2:
-					case 3:
-						throw new Error('Invalid opcode ' + this.opcode.toString(2) + ' at address ' + this.PC);
+					case 2: // cc = 10
+						switch(bbb) {
+							case 0:
+								this.addr_mode = 'immediate';
+								if(this.opcode_cycle === 1) {
+									this.operand = emulator.read_byte(this.PC);
+									this.PC += 1;
+								}								
+								break;
+							case 1:
+								this.addr_mode = 'zeropage';
+								if(this.opcode_cycle === 1) {
+									this.operand = emulator.read_byte(this.PC);
+									this.PC += 1;
+								}																
+								break;
+							case 2:
+								this.addr_mode = 'accumulator';
+								break;
+							case 3:
+								this.addr_mode = 'absolute';
+								break;
+							case 5:
+								this.addr_mode = 'zeropage,x';
+								break;
+							case 7:
+								this.addr_mode = 'absolute,x';
+							default:
+								throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + opcode.toString(2) + ' at address ' + this.PC);
+						}
+						switch(aaa) {
+							case 0:
+								this.opcode_name = 'ASL';
+								switch(this.addr_mode) {
+									case 'accumulator':
+										if(this.opcode_cycle === 2) {
+											this.A = this.A << 1;
+											opcode_done = true;
+										}
+										break;
+									default:
+										throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + opcode.toString(2) + ' at address ' + this.PC);
+								}
+								break;
+							default:
+								throw new Error('Invalid opcode ' + this.opcode.toString(2) + ' at address ' + this.PC) + ' cc=10';	
+						}
+						break;
+					case 3: // cc = 11
+						throw new Error('Invalid opcode ' + this.opcode.toString(2) + ' at address ' + this.PC + ' cc=11');
 				}
 
 		}
