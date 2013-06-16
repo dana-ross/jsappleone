@@ -2,6 +2,7 @@
 
 	this.rom_loaded = false;
 	this.cpu_initialized = false;
+	var self = this;
 
 	this.generate_ram = function(bytes) {
 		var ram = new Uint8Array(bytes);
@@ -12,7 +13,7 @@
 	};
 
 	this.load_rom = function(url) {
-		var self = this, req = new XMLHttpRequest();
+		var req = new XMLHttpRequest();
 
 		req.open("GET", url, true);
 		req.responseType = "arraybuffer";
@@ -149,8 +150,14 @@
 		document.onkeypress = function(e) {
 			var key = uppercase(e.keyCode ? e.keyCode : e.charCode);
 			console.log("ASCII code " + key);
-			write_byte(0xd011, 128);
-			write_byte(0xd010, (128 | (key & 127)));
+			// write_byte(0xd011, 128);
+			// write_byte(0xd010, (128 | (key & 127)));
+			if(key == 13) {
+				self.terminal.newline();
+			}
+			else {
+				self.terminal.insert_char(key);
+			}
 		};
 
 	})();
