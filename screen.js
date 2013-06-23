@@ -11,7 +11,7 @@ function screen(emulator) {
      * @param int y
      */
     this.point = function(x,y) {
-    	this.screen.fillStyle = '#8f8';
+    	this.screen.fillStyle = '#9f9';
     	this.screen.fillRect(x, y, 1, 1);
     };
 
