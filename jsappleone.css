@@ -1,0 +1,25 @@
+canvas {
+	border: 20px solid #000;
+	border-radius: 20px;
+}
+
+body {
+	min-width: 320px;
+	max-width: 960px;
+	width: 100%;
+	margin: 1em auto;
+	font-size: 14px;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+div[role=main] {
+	float: left;
+	font-size: 1em;
+	line-height: 1.5;
+	width: 100%;
+	max-width: 580px;
+	margin-right: 20px;
+}
+div[role=app] {
+	float: left;
+}
