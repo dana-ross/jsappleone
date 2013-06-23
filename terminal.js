@@ -55,6 +55,9 @@ function terminal(emulator) {
 	this.insert_char = function(character) {
 		this.shift_register[this.insert_pos] = character;
 		this.insert_pos += 1;
+		if(this.insert_pos > (40 * 24)) {
+			this.insert_pos = 0;
+		}
 	};
 
 	this.newline = function() {
