@@ -3,6 +3,8 @@ function CPU6502(emulator) {
 	this.A = 0; this.X =0; this.Y = 0; this.S = 32 /* bit 5 set */; this.SP = 0; this.PC = 0;
 	this.opcode = 0; this.opcode_name = ''; this.opcode_cycle = 0; this.addr_mode = '';
 	this.operand = 0; this.instruction_addr = 0;
+	this.do_irq = false; // true if IRQ processing needs to happen after current instruction
+	this.do_nmi = false;
 
 	this.reset = function() {
 		this.A = this.X = this.Y = 0;
@@ -127,7 +129,13 @@ function CPU6502(emulator) {
 	};
 
 	this.irq = function() {
-		// @TODO implement
+		if(!(this.S & 4)) {
+			this.do_irq = true;
+		}
+	}
+
+	this.nmi = function() {
+		this.do_nmi = true;
 	}
 
 	this.tick = function() {
@@ -168,6 +176,20 @@ function CPU6502(emulator) {
 		}
 
 		if(this.opcode_cycle === 0) {
+			if(this.do_irq) {
+				this.push_word(this.PC);
+				this.push_byte(this.S);
+				this.S &= 251; // disable interrupts
+				this.PC = emulator.read_word(0xfffe);
+			}
+
+			if(this.do_nmi) {
+				this.push_word(this.PC);
+				this.push_byte(this.S);
+				this.S &= 251; // disable interrupts
+				this.PC = emulator.read_word(0xffea);
+			}
+
 			this.instruction_addr = this.PC;
 			this.opcode = emulator.read_byte(this.instruction_addr);
 			this.addr_mode = 'immediate';
@@ -254,6 +276,9 @@ function CPU6502(emulator) {
 			case 0x78:
 				this.opcode_name = 'SEI';
 				this.addr_mode = 'implied';
+				// Set bit 2 of status
+				this.S |= 4;
+				opcode_done = true;
 				break;
 			case 0x98:
 				this.opcode_name = 'TYA';
@@ -355,6 +380,14 @@ function CPU6502(emulator) {
 					opcode_done = true;
 				}
 				break;
+			case 0x40:
+				this.opcode_name = 'RTI';
+				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 6) {
+					this.S = this.pop_byte();
+					this.PC = this.pop_word();
+					opcode_done = true;
+				}
 			case 0x50:
 				this.opcode_name = 'BVC';
 				this.addr_mode = 'implied';
