@@ -326,7 +326,6 @@ function CPU6502(emulator) {
 				if(this.opcode_cycle === 1) {
 					this.operand = emulator.read_byte(this.PC);
 					this.PC += 1;
-					console.log((this.S & 128).toString(2));
 					if(this.S & 128) {
 						this.calculate_branch(this.operand);
 					}
