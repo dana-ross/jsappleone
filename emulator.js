@@ -47,13 +47,11 @@
 
 		var bank = Math.floor(addr / 4096);
 		var bank_addr = addr % 4096;
-		console.log('Reading addr ' + addr + '($' + addr.toString(16) + ') from bank ' + bank);
 
 		// TODO support memory remapping to support Woz's patching area
 		// see http://www.sbprojects.com/projects/apple1/a1block.php
 		switch(bank) {
 			case 0:
-				console.log('Read value ' + ramX[bank_addr] + '(' + ramX[bank_addr].toString(16) + ') from addr ' + addr + '($' + addr.toString(16) + ')');
 				return ramX[bank_addr];
 			case 1:
 			case 2:
@@ -93,7 +91,6 @@
 
 		var bank = Math.floor(addr / 4096);
 		var bank_addr = addr % 4096;
-		console.log('Writing value ' + value + '($' + value.toString(16) + ') to addr ' + bank_addr + '($' + bank_addr.toString(16) + ') in bank ' + bank);
 
 		// TODO support memory remapping to support Woz's patching area
 		// see http://www.sbprojects.com/projects/apple1/a1block.php
