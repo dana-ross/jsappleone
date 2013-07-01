@@ -598,7 +598,6 @@ function CPU6502(emulator) {
 									case 'absolute':
 										if(this.opcode_cycle === 4) {
 											this.A = emulator.read_byte(this.operand);
-											console.log('read ' + this.A + ' from ' + this.operand.toString(16));
 											this.set_nz(this.A);
 											opcode_done = true;
 										}
@@ -606,7 +605,6 @@ function CPU6502(emulator) {
 									case 'absolute,y':
 										if(this.opcode_cycle === 4) {
 											this.A = emulator.read_byte((this.operand + this.Y) & 0xffff);
-											console.log('read ' + this.A + ' from ' + ((this.operand + this.Y) & 0xffff).toString(16));
 											this.set_nz(this.A);
 											opcode_done = true;
 										}
