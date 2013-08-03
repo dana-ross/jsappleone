@@ -360,9 +360,9 @@ function CPU6502(emulator) {
 			case 0x20:
 				this.opcode_name = 'JSR';
 				this.addr_mode = 'absolute';
+				this.operand = emulator.read_word(this.PC);
 				if(this.opcode_cycle === 6) {
 					this.push_word(this.PC + 2);
-					this.operand = emulator.read_word(this.PC);
 					this.PC = this.operand;
 					console.log('Branching to ' + this.operand + '(' + this.operand.toString(16) + ')');
 					opcode_done = true;
