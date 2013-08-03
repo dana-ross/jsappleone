@@ -45,9 +45,9 @@ function PIA6821(emulator) {
 
 	this.output_a = function() {
 		return this.PAO & this.DDRA;
-	}
+	};
 
 	this.output_b = function() {
 		return this.PBO & this.DDRB;
-	}
+	};
 }
