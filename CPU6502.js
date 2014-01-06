@@ -141,6 +141,7 @@ function CPU6502(emulator) {
 	this.tick = function() {
 
 		function format_operand(operand, addr_mode) {
+			var operand_symbol = emulator.symbol_table(operand);
 			switch(addr_mode) {
 				case 'implied':
 				case 'accumulator':
@@ -149,13 +150,13 @@ function CPU6502(emulator) {
 					return '#$' + operand.toString(16);
 				case 'absolute':
 				case 'zeropage':
-					return '$' + operand.toString(16);
+					return (undefined !== operand_symbol) ? operand_symbol : ('$' + operand.toString(16));
 				case 'absolute,x':
 				case 'zeropage,x':
-					return '$' + operand.toString(16) + ',X';
+					return (undefined !== operand_symbol) ? operand_symbol : ('$' + operand.toString(16)) + ',X';
 				case 'absolute,y':
 				case 'zeropage,y':
-					return '$' + operand.toString(16) + ',Y';
+					return (undefined !== operand_symbol) ? operand_symbol : ('$' + operand.toString(16)) + ',Y';
 				case 'relative':
 					if(operand & 128) {
 						return '*-' + (~operand & 127).toString(10);
@@ -719,7 +720,11 @@ function CPU6502(emulator) {
 		}
 
 		// console.log('Processed opcode ' + this.opcode_name + ' address mode ' + this.addr_mode + ' cycle ' + this.opcode_cycle);
-		console.log('$' + this.instruction_addr.toString(16).toUpperCase() + ' ' + this.opcode_name + ' ' + format_operand(this.operand, this.addr_mode) + '(' + this.opcode_cycle + ')');
+		var instruction_addr_symbol = emulator.symbol_table(this.instruction_addr);
+		if(1 === this.opcode_cycle) {
+			console.log(((undefined !== instruction_addr_symbol) ? instruction_addr_symbol : ('$' + this.instruction_addr.toString(16).toUpperCase())) + ' ' + this.opcode_name + ' ' + format_operand(this.operand, this.addr_mode) + '(' + this.opcode_cycle + ')');
+		}
+
 		if(opcode_done) {
 			this.opcode_cycle = 0;
 		}

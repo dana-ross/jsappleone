@@ -159,6 +159,55 @@
 
 	})();
 
+		this.symbol_table = function(addr) {
+
+		var symbols = {
+			0x24: 'XAML',
+			0x25: 'XAMH',
+			0x26: 'STL',
+			0x27: 'STH',
+			0x28: 'L',
+			0x29: 'H',
+			0x2A: 'YSAV',
+			0x2B: 'MODE',
+
+			0x0200: 'IN',
+			0xd010: 'KBD',
+			0xd011: 'KBDCR',
+			0xd012: 'DSP',
+			0xd013: 'DSPCR',
+
+			0xff00: 'RESET',
+			0xff0f: 'NOTCR',
+			0xff1a: 'ESCAPE',
+			0xff1f: 'GETLINE',
+			0xff26: 'BACKSPACE',
+			0xff29: 'NEXTCHAR',
+			0xff40: 'SETSTOR',
+			0xff41: 'SETMODE',
+			0xff43: 'BLSKIP',
+			0xff44: 'NEXTITEM',
+			0xff5f: 'NEXTHEX',
+			0xff6e: 'DIG',
+			0xff74: 'HEXSHIFT',
+			0xff7f: 'NOTHEX',
+			0xff91: 'TONEXTITEM',
+			0xff94: 'RUN',
+			0xff97: 'NOTSTOR',
+			0xff9b: 'SETADR',
+			0xffa4: 'NXTPRNT',
+			0xffba: 'PRDATA',
+			0Xffc4: 'XAMNEXT',
+			0xffd6: 'MOD8CHK',
+			0xffdc: 'PRBYTE',
+			0xffe5: 'PRHEX',
+			0xffef: 'ECHO'
+		};
+
+		return symbols[addr];
+
+	};
+
 	this.tick = function() {
 		if(rom_loaded && terminal.charmap_loaded) {
 			if(!cpu_initialized) {
