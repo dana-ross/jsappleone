@@ -65,12 +65,17 @@ function terminal(emulator) {
 	};
 
 	this.tick = function() {
-		var key = emulator.read_byte(0xd012);
-		if(0 !== (key & 127)) {
+		var key = (emulator.read_byte(0xd012) & 127);
+		if(0 !== key) {
 			// debugger;
-			console.log("D012 has " + key);
-			this.insert_char(key);
-			// emulator.write_byte(0xd013, 0xff);
+			// console.log("D012 has " + key);
+			if(13 !== key) {
+				this.insert_char(key);
+			}
+			// emulator.write_byte(0xd010, 0);
+			// emulator.write_byte(0xd011, 0);
+			emulator.write_byte(0xd012, 0);
+			// emulator.write_byte(0xd013, 0);
 		}
 		// emulator.write_byte(0xd012, emulator.read_byte(0xd012) & 63);
 	};
