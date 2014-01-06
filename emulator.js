@@ -2,6 +2,7 @@
 
 	this.rom_loaded = false;
 	this.cpu_initialized = false;
+	this.cycle_count = 0;
 	var self = this;
 
 	this.generate_ram = function(bytes) {
@@ -211,6 +212,7 @@
 	};
 
 	this.tick = function() {
+		this.cycle_count += 1;
 		if(rom_loaded && terminal.charmap_loaded) {
 			if(!cpu_initialized) {
 				cpu.reset();
