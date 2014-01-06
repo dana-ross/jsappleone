@@ -228,7 +228,7 @@
 
 		var status_display = document.getElementById('status_display');
 		if(status_display) {
-			status_display.value = cpu.status() + pia.status();
+			status_display.value = 'cycle: ' + cycle_count + "\n" + cpu.status() + pia.status();
 		}
 
 		setTimeout(tick, 10);
