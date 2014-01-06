@@ -732,4 +732,11 @@ function CPU6502(emulator) {
 			this.opcode_cycle += 1;
 		}
 	};
+
+	this.status = function() {
+		return 'A: ' + this.A.toString(16) + ' X: ' + this.X.toString(16) + ' Y: ' + this.Y.toString(16) + "\n" +
+		       'S: ' + this.S.toString(2) + "\n" +
+		       'PC: ' + this.PC.toString(16) + ' opcode: ' + this.opcode.toString(16) + ' ' + this.opcode_name + ' ' + this.addr_mode + "\n";
+	};
+
 }

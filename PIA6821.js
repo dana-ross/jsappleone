@@ -50,4 +50,12 @@ function PIA6821(emulator) {
 	this.output_b = function() {
 		return this.PBO & this.DDRB;
 	};
+
+	this.status = function() {
+		return 'PAO: ' + this.PAO.toString(2) + ' ' + this.PAO.toString(16) + "\n" +
+		       'CRA: ' + this.CRA.toString(2) + ' ' + this.CRA.toString(16) + "\n" +
+		       'PB0: ' + this.PBO.toString(2) + ' ' + this.PBO.toString(16) + "\n" +
+		       'CRB: ' + this.CRB.toString(2) + ' ' + this.CRB.toString(16) + "\n";
+	};
+
 }

@@ -220,6 +220,12 @@
 		else {
 			console.log('ROM not loaded');
 		}
+
+		var status_display = document.getElementById('status_display');
+		if(status_display) {
+			status_display.value = cpu.status() + pia.status();
+		}
+
 	};
 
 	setInterval(tick, 100);
