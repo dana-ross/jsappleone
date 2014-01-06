@@ -30,7 +30,7 @@ function terminal(emulator) {
 
 	/**
 	 * Repaint the screen
-	 */	
+	 */
 	this.draw_screen = function() {
 		var bitmap;
 		emulator.screen.clear();
@@ -46,7 +46,7 @@ function terminal(emulator) {
 				}
 			}
 		}
-		window.requestAnimationFrame(self.draw_screen);	
+		window.requestAnimationFrame(self.draw_screen);
 	};
 
 	/**
@@ -62,13 +62,12 @@ function terminal(emulator) {
 
 	this.newline = function() {
 		this.insert_pos = (Math.floor(this.insert_pos / 40) * 40) + 40;
-	}
+	};
 
 	this.shift_register = emulator.generate_ram(1024);
 	this.charmap_loaded = false;
 	this.load_rom('rom/charmap.rom');
 	this.insert_pos = 0;
 	var self = this;
-
 
 }
