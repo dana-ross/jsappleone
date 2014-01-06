@@ -64,6 +64,17 @@ function terminal(emulator) {
 		this.insert_pos = (Math.floor(this.insert_pos / 40) * 40) + 40;
 	};
 
+	this.tick = function() {
+		var key = emulator.read_byte(0xd012);
+		if(0 !== (key & 127)) {
+			// debugger;
+			console.log("D012 has " + key);
+			this.insert_char(key);
+			// emulator.write_byte(0xd013, 0xff);
+		}
+		// emulator.write_byte(0xd012, emulator.read_byte(0xd012) & 63);
+	};
+
 	this.shift_register = emulator.generate_ram(1024);
 	this.charmap_loaded = false;
 	this.load_rom('rom/charmap.rom');

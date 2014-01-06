@@ -5,21 +5,25 @@ function PIA6821(emulator) {
 	this.emulator = emulator;
 
 	this.read = function(rs) {
+		// debugger;
 		switch(rs) {
 			case 0:
-				this.CRA = this.CRA & 127;
-				return (this.CRA & 3) ? (this.PAI & ~this.DDRA) : this.DDRA;
+				// this.CRA = this.CRA & 127;
+				// return (this.CRA & 3) ? (this.PAO & ~this.DDRA) : this.DDRA;
+				return this.PAO;
 			case 1:
 				return this.CRA;
 			case 2:
-				this.CRB = this.CRB & 127;
-				return (this.CRB & 3) ? (this.PBI & ~this.DDRB) : this.DDRB;
+				// this.CRB = this.CRB & 127;
+				// return (this.CRB & 3) ? (this.PBO & ~this.DDRB) : this.DDRB;
+				return this.PBO;
 			case 3:
 				return this.CRB;
 		}
 	};
 
 	this.write = function(rs, value) {
+		// debugger;
 		switch(rs) {
 			case 0:
 				this.PAO = value;
@@ -28,6 +32,7 @@ function PIA6821(emulator) {
 				this.CRA = value & 63;
 				break;
 			case 2:
+				console.log("Writing " + value + ' to D012');
 				this.PBO = value;
 				break;
 			case 3:
@@ -36,12 +41,12 @@ function PIA6821(emulator) {
 		}
 	};
 
-	this.trigger_ca1 = function() {
-		this.CRA = this.CRA | 128;
-		if(this.CRA & 1) {
-			this.emulator.cpu.irq();
-		}
-	};
+	// this.trigger_ca1 = function() {
+	// 	this.CRA = this.CRA | 128;
+	// 	if(this.CRA & 1) {
+	// 		this.emulator.cpu.irq();
+	// 	}
+	// };
 
 	this.output_a = function() {
 		return this.PAO & this.DDRA;

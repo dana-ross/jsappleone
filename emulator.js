@@ -147,20 +147,22 @@
 		document.onkeypress = function(e) {
 			var key = uppercase(e.keyCode ? e.keyCode : e.charCode);
 			console.log("ASCII code " + key);
-			// write_byte(0xd011, 128);
-			// write_byte(0xd010, (128 | (key & 127)));
+			write_byte(0xd011, 255);
+			write_byte(0xd010, (128 | (key & 127)));
+			// write_byte(0xd010, key);
 			if(key == 13) {
 				self.terminal.newline();
 			}
-			else {
-				self.terminal.insert_char(key);
-			}
+			// else {
+				// self.terminal.insert_char(key);
+			// }
+			// pia.trigger_ca1();
 		};
 
 	})();
 
-		this.symbol_table = function(addr) {
 
+	this.symbol_table = function(addr) {
 		var symbols = {
 			0x24: 'XAML',
 			0x25: 'XAMH',
@@ -215,6 +217,7 @@
 			}
 			else {
 				cpu.tick();
+				terminal.tick();
 			}
 		}
 		else {
@@ -226,8 +229,8 @@
 			status_display.value = cpu.status() + pia.status();
 		}
 
+		setTimeout(tick, 10);
 	};
-
-	setInterval(tick, 100);
+	tick();
 
 })();

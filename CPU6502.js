@@ -479,7 +479,7 @@ function CPU6502(emulator) {
 						}
 						switch(aaa) {
 							case 0:
-								throw new Error('Invalid opcode ' + opcode.toString(2) + ' at address ' + this.PC);
+								throw new Error('Invalid opcode ' + aaa.toString(2) + ' at address ' + this.PC);
 							case 1:
 								this.opcode_name = 'BIT';
 								switch(this.addr_mode) {
@@ -720,8 +720,9 @@ function CPU6502(emulator) {
 		}
 
 		// console.log('Processed opcode ' + this.opcode_name + ' address mode ' + this.addr_mode + ' cycle ' + this.opcode_cycle);
-		var instruction_addr_symbol = emulator.symbol_table(this.instruction_addr);
+
 		if(1 === this.opcode_cycle) {
+			var instruction_addr_symbol = emulator.symbol_table(this.instruction_addr);
 			console.log(((undefined !== instruction_addr_symbol) ? instruction_addr_symbol : ('$' + this.instruction_addr.toString(16).toUpperCase())) + ' ' + this.opcode_name + ' ' + format_operand(this.operand, this.addr_mode) + '(' + this.opcode_cycle + ')');
 		}
 
