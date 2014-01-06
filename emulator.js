@@ -154,6 +154,11 @@
 			if(key == 13) {
 				self.terminal.newline();
 			}
+
+			setTimeout(function() {
+				write_byte(0xd010, 0);
+				write_byte(0xd011, 207);
+			}, 1000);
 			// else {
 				// self.terminal.insert_char(key);
 			// }
@@ -231,7 +236,7 @@
 			status_display.value = 'cycle: ' + cycle_count + "\n" + cpu.status() + pia.status();
 		}
 
-		setTimeout(tick, 10);
+		setTimeout(tick, 1);
 	};
 	tick();
 
