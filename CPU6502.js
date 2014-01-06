@@ -117,7 +117,7 @@ function CPU6502(emulator) {
 	this.pop_byte = function() {
 		this.SP = (this.SP - 1) & 0xff;
 		return emulator.read_byte(this.SP + 0x100);
-	}
+	};
 
 	/**
 	 * Pop a word off the stack
@@ -132,11 +132,11 @@ function CPU6502(emulator) {
 		if(!(this.S & 4)) {
 			this.do_irq = true;
 		}
-	}
+	};
 
 	this.nmi = function() {
 		this.do_nmi = true;
-	}
+	};
 
 	this.tick = function() {
 
@@ -388,6 +388,7 @@ function CPU6502(emulator) {
 					this.PC = this.pop_word();
 					opcode_done = true;
 				}
+				break;
 			case 0x50:
 				this.opcode_name = 'BVC';
 				this.addr_mode = 'implied';
@@ -689,6 +690,7 @@ function CPU6502(emulator) {
 								break;
 							case 7:
 								this.addr_mode = 'absolute,x';
+								break;
 							default:
 								throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + opcode.toString(2) + ' at address ' + this.PC);
 						}
