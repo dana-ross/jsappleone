@@ -145,7 +145,7 @@
 			return keyCode;
 		}
 
-		document.onkeypress = function(e) {
+		document.onkeydown = function(e) {
 			var key = uppercase(e.keyCode ? e.keyCode : e.charCode);
 			console.log("ASCII code " + key);
 			write_byte(0xd011, 255);
@@ -155,14 +155,19 @@
 				self.terminal.newline();
 			}
 
-			setTimeout(function() {
-				write_byte(0xd010, 0);
-				write_byte(0xd011, 207);
-			}, 1000);
-			// else {
+			// setTimeout(function() {
+			// 	write_byte(0xd010, 0);
+			// 	write_byte(0xd011, 207);
+			// }, 1000);
+			// // else {
 				// self.terminal.insert_char(key);
 			// }
 			// pia.trigger_ca1();
+		};
+
+		document.onkeyup = function(e) {
+			write_byte(0xd010, 0);
+			write_byte(0xd011, 207);
 		};
 
 	})();
