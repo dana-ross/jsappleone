@@ -410,10 +410,26 @@ function CPU6502(emulator) {
 			case 0x90:
 				this.opcode_name = 'BCC';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.operand = emulator.read_byte(this.PC);
+					this.PC += 1;
+					if(!(this.S & 1)) {
+						this.calculate_branch(this.operand);
+					}
+					opcode_done = true;
+				}
 				break;
 			case 0xb0:
 				this.opcode_name = 'BCS';
 				this.addr_mode = 'implied';
+				if(this.opcode_cycle === 2) {
+					this.operand = emulator.read_byte(this.PC);
+					this.PC += 1;
+					if(this.S & 1) {
+						this.calculate_branch(this.operand);
+					}
+					opcode_done = true;
+				}
 				break;
 			case 0xd0:
 				this.opcode_name = 'BNE';
