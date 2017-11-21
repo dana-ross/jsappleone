@@ -449,7 +449,7 @@ function CPU6502(emulator) {
 				if(this.opcode_cycle === 1) {
 					this.operand = emulator.read_byte(this.PC);
 					this.PC += 1;
-					if(!(this.S & 2)) {
+					if(this.S & 2) {
 						this.calculate_branch(this.operand);
 					}
 					opcode_done = true;
