@@ -215,18 +215,22 @@ function CPU6502(emulator) {
 			case 0x08:
 				this.opcode_name = 'PHP';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x28:
 				this.opcode_name = 'PLP';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x48:
 				this.opcode_name = 'PHA';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x68:
 				this.opcode_name = 'PLA';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x88:
 				this.opcode_name = 'DEY';
@@ -262,10 +266,12 @@ function CPU6502(emulator) {
 			case 0x18:
 				this.opcode_name = 'CLC';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x38:
 				this.opcode_name = 'SEC';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x58:
 				this.opcode_name = 'CLI';
@@ -284,10 +290,12 @@ function CPU6502(emulator) {
 			case 0x98:
 				this.opcode_name = 'TYA';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0xb8:
 				this.opcode_name = 'CLV';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0xd8:
 				this.opcode_name = 'CLD';
@@ -299,6 +307,7 @@ function CPU6502(emulator) {
 			case 0xf8:
 				this.opcode_name = 'SED';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x8a:
 				this.opcode_name = 'TXA';
@@ -393,6 +402,7 @@ function CPU6502(emulator) {
 			case 0x50:
 				this.opcode_name = 'BVC';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x60:
 				this.opcode_name = 'RTS';
@@ -406,6 +416,7 @@ function CPU6502(emulator) {
 			case 0x70:
 				this.opcode_name = 'BVS';
 				this.addr_mode = 'implied';
+				throw "Unimplemented opcode " + this.opcode_name;
 				break;
 			case 0x90:
 				this.opcode_name = 'BCC';
