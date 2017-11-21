@@ -1,24 +1,24 @@
-(function() {
+(function () {
 
 	this.rom_loaded = false;
 	this.cpu_initialized = false;
 	this.cycle_count = 0;
 	var self = this;
 
-	this.generate_ram = function(bytes) {
+	this.generate_ram = function (bytes) {
 		var ram = new Uint8Array(bytes);
-		for(var i = 0; i < bytes; i++) {
+		for (var i = 0; i < bytes; i++) {
 			ram[i] = 0;
 		}
 		return ram;
 	};
 
-	this.load_rom = function(url) {
+	this.load_rom = function (url) {
 		var req = new XMLHttpRequest();
 
 		req.open("GET", url, true);
 		req.responseType = "arraybuffer";
-		req.onload = function(e) {
+		req.onload = function (e) {
 			romY_data = req.response;
 			romY = new Uint8Array(romY_data);
 			rom_loaded = true;
@@ -30,19 +30,20 @@
 	var ramX = generate_ram(4096);
 	var ramW = generate_ram(4096);
 	var pia = new PIA6821(this);
-	var romY, romY_data; load_rom('rom/monitor.rom');
+	var romY, romY_data;
+	load_rom('rom/monitor.rom');
 
-	this.read_word = function(addr) {
-		var hi = (read_byte(addr+1) * 256);
+	this.read_word = function (addr) {
+		var hi = (read_byte(addr + 1) * 256);
 		var lo = read_byte(addr);
 		return hi + lo;
 	};
 
-	this.read_byte = function(addr) {
+	this.read_byte = function (addr) {
 
 		addr = Math.floor(addr);
 
-		if(addr > 65535 || addr < 0) {
+		if (addr > 65535 || addr < 0) {
 			throw new Error('Invalid read address ' + addr);
 		}
 
@@ -51,7 +52,7 @@
 
 		// TODO support memory remapping to support Woz's patching area
 		// see http://www.sbprojects.com/projects/apple1/a1block.php
-		switch(bank) {
+		switch (bank) {
 			case 0:
 				return ramX[bank_addr];
 			case 1:
@@ -82,11 +83,11 @@
 
 	};
 
-	this.write_byte = function(addr, value) {
+	this.write_byte = function (addr, value) {
 
 		addr = Math.floor(addr);
 
-		if(addr > 65535 || addr < 0) {
+		if (addr > 65535 || addr < 0) {
 			throw new Error('Invalid write address ' + addr);
 		}
 
@@ -95,7 +96,7 @@
 
 		// TODO support memory remapping to support Woz's patching area
 		// see http://www.sbprojects.com/projects/apple1/a1block.php
-		switch(bank) {
+		switch (bank) {
 			case 0:
 				ramX[bank_addr] = value;
 				return;
@@ -131,27 +132,27 @@
 	this.terminal = new terminal(this);
 	this.cpu = new CPU6502(this);
 
-	var keyboard = (function() {
+	var keyboard = (function () {
 
 		/**
 		 * Convert a lowercase keyCode to uppercase
 		 */
 		function uppercase(keyCode) {
 			// 97 = a, 65 = A
-			if(keyCode >= 97 && keyCode <= 122) {
+			if (keyCode >= 97 && keyCode <= 122) {
 				return keyCode - 32;
 			}
 			// Fall through. Return what was passed.
 			return keyCode;
 		}
 
-		document.onkeydown = function(e) {
+		document.onkeydown = function (e) {
 			var key = uppercase(e.keyCode ? e.keyCode : e.charCode);
 			console.log("ASCII code " + key);
 			write_byte(0xd011, 255);
 			write_byte(0xd010, (128 | (key & 127)));
 			// write_byte(0xd010, key);
-			if(key == 13) {
+			if (key == 13) {
 				self.terminal.newline();
 			}
 
@@ -160,12 +161,12 @@
 			// 	write_byte(0xd011, 207);
 			// }, 1000);
 			// // else {
-				// self.terminal.insert_char(key);
+			// self.terminal.insert_char(key);
 			// }
 			// pia.trigger_ca1();
 		};
 
-		document.onkeyup = function(e) {
+		document.onkeyup = function (e) {
 			write_byte(0xd010, 0);
 			write_byte(0xd011, 207);
 		};
@@ -173,7 +174,7 @@
 	})();
 
 
-	this.symbol_table = function(addr) {
+	this.symbol_table = function (addr) {
 		var symbols = {
 			0x24: 'XAML',
 			0x25: 'XAMH',
@@ -221,23 +222,21 @@
 
 	};
 
-	this.tick = function() {
+	this.tick = function () {
 		this.cycle_count += 1;
-		if(rom_loaded && terminal.charmap_loaded) {
-			if(!cpu_initialized) {
+		if (rom_loaded && terminal.charmap_loaded) {
+			if (!cpu_initialized) {
 				cpu.reset();
-			}
-			else {
+			} else {
 				cpu.tick();
 				terminal.tick();
 			}
-		}
-		else {
+		} else {
 			console.log('ROM not loaded');
 		}
 
 		var status_display = document.getElementById('status_display');
-		if(status_display) {
+		if (status_display) {
 			status_display.value = 'cycle: ' + cycle_count + "\n" + cpu.status() + pia.status();
 		}
 

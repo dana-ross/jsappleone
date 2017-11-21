@@ -1,12 +1,18 @@
 function PIA6821(emulator) {
 
-	this.CRA = 0; this.PAI = 0; this.PAO = 0; this.DDRA = 0;
-	this.CRB = 0; this.PBI = 0; this.PBO = 0; this.DDRB = 0;
+	this.CRA = 0;
+	this.PAI = 0;
+	this.PAO = 0;
+	this.DDRA = 0;
+	this.CRB = 0;
+	this.PBI = 0;
+	this.PBO = 0;
+	this.DDRB = 0;
 	this.emulator = emulator;
 
-	this.read = function(rs) {
+	this.read = function (rs) {
 		// debugger;
-		switch(rs) {
+		switch (rs) {
 			case 0:
 				// this.CRA = this.CRA & 127;
 				// return (this.CRA & 3) ? (this.PAO & ~this.DDRA) : this.DDRA;
@@ -22,9 +28,9 @@ function PIA6821(emulator) {
 		}
 	};
 
-	this.write = function(rs, value) {
+	this.write = function (rs, value) {
 		// debugger;
-		switch(rs) {
+		switch (rs) {
 			case 0:
 				this.PAO = value;
 				break;
@@ -48,19 +54,19 @@ function PIA6821(emulator) {
 	// 	}
 	// };
 
-	this.output_a = function() {
+	this.output_a = function () {
 		return this.PAO & this.DDRA;
 	};
 
-	this.output_b = function() {
+	this.output_b = function () {
 		return this.PBO & this.DDRB;
 	};
 
-	this.status = function() {
+	this.status = function () {
 		return 'PAO: ' + this.PAO.toString(2) + ' ' + this.PAO.toString(16) + "\n" +
-		       'CRA: ' + this.CRA.toString(2) + ' ' + this.CRA.toString(16) + "\n" +
-		       'PB0: ' + this.PBO.toString(2) + ' ' + this.PBO.toString(16) + "\n" +
-		       'CRB: ' + this.CRB.toString(2) + ' ' + this.CRB.toString(16) + "\n";
+			'CRA: ' + this.CRA.toString(2) + ' ' + this.CRA.toString(16) + "\n" +
+			'PB0: ' + this.PBO.toString(2) + ' ' + this.PBO.toString(16) + "\n" +
+			'CRB: ' + this.CRB.toString(2) + ' ' + this.CRB.toString(16) + "\n";
 	};
 
 }
