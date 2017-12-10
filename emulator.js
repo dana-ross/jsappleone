@@ -240,7 +240,7 @@
 			status_display.value = 'cycle: ' + cycle_count + "\n" + cpu.status() + pia.status();
 		}
 
-		setTimeout(tick, 1);
+		setTimeout(tick, 250);
 	};
 	tick();
 

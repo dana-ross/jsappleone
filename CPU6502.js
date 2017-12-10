@@ -81,6 +81,13 @@ function CPU6502(emulator) {
 
 	};
 
+	/**
+	 * Set/reset the carry flag
+	 */
+	this.setc = function (result) {
+		this.S = (this.S & 254) + (result >= 0);
+	}
+
 	this.calculate_branch = function (operand) {
 		if (operand & 128) {
 			console.log('Branching backward ' + (~operand & 127) + ' bytes');
@@ -208,7 +215,7 @@ function CPU6502(emulator) {
 		var aaa = (this.opcode & 224) >> 5,
 			bbb = (this.opcode & 28) >> 2,
 			cc = this.opcode & 3;
-
+console.log(`aaa: ${aaa} bbb: ${bbb} cc: ${cc}`)
 		if (cc == 3) {
 			throw new Error('Invalid 11 opcode ' + this.opcode.toString(2));
 		}
@@ -270,12 +277,12 @@ function CPU6502(emulator) {
 			case 0x18:
 				this.opcode_name = 'CLC';
 				this.addr_mode = 'implied';
-				throw "Unimplemented opcode " + this.opcode_name;
+				this.setc(-1)
 				break;
 			case 0x38:
 				this.opcode_name = 'SEC';
 				this.addr_mode = 'implied';
-				throw "Unimplemented opcode " + this.opcode_name;
+				this.setc(1)
 				break;
 			case 0x58:
 				this.opcode_name = 'CLI';
@@ -540,11 +547,20 @@ function CPU6502(emulator) {
 								this.opcode_name = 'STY';
 								switch (this.addr_mode) {
 									case 'absolute':
-										if (this.opcode_cycle == 3) {
+										if (this.opcode_cycle === 4) {
 											emulator.write_byte(this.operand, this.Y);
 											opcode_done = true;
 										}
 										break;
+									case 'zeropage':
+										if(this.opcode_cycle === 3) {
+											emulator.write_byte(this.operand, this.Y)
+											opcode_done = true
+										}
+										break;
+									default:
+										throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + this.opcode.toString(2) + ' at address ' + this.PC);
+
 								}
 								break;
 							case 5:
@@ -684,7 +700,8 @@ function CPU6502(emulator) {
 								switch (this.addr_mode) {
 									case 'immediate':
 										if (this.opcode_cycle === 1) {
-											this.set_nz(this.A - this.operand);
+											this.set_nz(this.A - this.operand)
+											this.setc(this.A >= this.operand)
 											opcode_done = true;
 										}
 								}
@@ -740,6 +757,19 @@ function CPU6502(emulator) {
 										throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + opcode.toString(2) + ' at address ' + this.PC);
 								}
 								break;
+							case 4:
+								this.opcode_name = 'STX'
+								switch (this.addr_mode) {
+									case 'zeropage':
+										if (this.opcode_cycle === 2) {
+											emulator.write_byte(this.operand, this.X)
+											opcode_done = true
+										}
+										break
+									default:
+										throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + opcode.toString(2) + ' at address ' + this.PC);
+								}
+								break
 							default:
 								throw new Error('Invalid opcode ' + this.opcode.toString(2) + ' at address ' + this.PC) + ' cc=10';
 						}

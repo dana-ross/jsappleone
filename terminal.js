@@ -75,7 +75,7 @@ function terminal(emulator) {
 			}
 			// emulator.write_byte(0xd010, 0);
 			// emulator.write_byte(0xd011, 0);
-			emulator.write_byte(0xd012, 0);
+			// emulator.write_byte(0xd012, 0);
 			// emulator.write_byte(0xd013, 0);
 		}
 		// emulator.write_byte(0xd012, emulator.read_byte(0xd012) & 63);
