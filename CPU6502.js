@@ -215,7 +215,7 @@ function CPU6502(emulator) {
 		var aaa = (this.opcode & 224) >> 5,
 			bbb = (this.opcode & 28) >> 2,
 			cc = this.opcode & 3;
-console.log(`aaa: ${aaa} bbb: ${bbb} cc: ${cc}`)
+		console.log(`aaa: ${aaa} bbb: ${bbb} cc: ${cc}`)
 		if (cc == 3) {
 			throw new Error('Invalid 11 opcode ' + this.opcode.toString(2));
 		}
@@ -553,7 +553,7 @@ console.log(`aaa: ${aaa} bbb: ${bbb} cc: ${cc}`)
 										}
 										break;
 									case 'zeropage':
-										if(this.opcode_cycle === 3) {
+										if (this.opcode_cycle === 3) {
 											emulator.write_byte(this.operand, this.Y)
 											opcode_done = true
 										}
@@ -642,7 +642,11 @@ console.log(`aaa: ${aaa} bbb: ${bbb} cc: ${cc}`)
 								this.opcode_name = 'AND';
 								break;
 							case 2:
-								this.opcode_name = 'EOR';
+								this.opcode_name = 'EOR'
+								switch (this.addr_mode) {
+									default:
+										throw new Error('Invalid addressing mode ' + bbb.toString(2) + ' for opcode ' + this.opcode.toString(2) + ' at address ' + this.PC);
+								}
 								break;
 							case 3:
 								this.opcode_name = 'ADC';
