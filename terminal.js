@@ -23,9 +23,17 @@ function terminal(emulator) {
 	 */
 	this.char_bitmap = function (character) {
 		var bitmap = new Uint8Array(8);
-		for (var scanline = 0; scanline < 8; scanline++) {
-			bitmap[scanline] = this.charmap[(character * 8) + scanline];
-		}
+		bitmap[scanline + 0] = this.charmap[(character * 8) + scanline + 0]
+		bitmap[scanline + 1] = this.charmap[(character * 8) + scanline + 1]
+		bitmap[scanline + 2] = this.charmap[(character * 8) + scanline + 2]
+		bitmap[scanline + 3] = this.charmap[(character * 8) + scanline + 3]
+		bitmap[scanline + 4] = this.charmap[(character * 8) + scanline + 4]
+		bitmap[scanline + 5] = this.charmap[(character * 8) + scanline + 5]
+		bitmap[scanline + 6] = this.charmap[(character * 8) + scanline + 6]
+		bitmap[scanline + 7] = this.charmap[(character * 8) + scanline + 7]
+		// for (var scanline = 0; scanline < 8; scanline++) {
+		// 	bitmap[scanline] = this.charmap[(character * 8) + scanline];
+		// }
 		return bitmap;
 	};
 
