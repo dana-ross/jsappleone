@@ -240,6 +240,7 @@ function CPU6502(emulator) {
 				if (this.opcode_cycle === 3) {
 					this.SP = (this.SP - 1) & 0x00ff;
 					emulator.write_byte(0x0100 + this.SP, this.A);
+					opcode_done = true;
 				}
 				break;
 			case 0x68:
