@@ -610,6 +610,7 @@ function CPU6502(emulator) {
 						switch (bbb) {
 							case 0:
 								this.addr_mode = 'zeropage,x';
+								throw new Error('Unimplemented addressing mode');
 								break;
 							case 1:
 								this.addr_mode = 'zeropage';
@@ -634,6 +635,7 @@ function CPU6502(emulator) {
 								break;
 							case 4:
 								this.addr_mode = 'zeropage,y';
+								throw new Error('Unimplemented addressing mode');
 								break;
 							case 5:
 								this.addr_mode = 'zeropage,x';
