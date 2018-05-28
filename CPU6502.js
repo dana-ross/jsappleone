@@ -238,7 +238,7 @@ function CPU6502(emulator) {
 				this.opcode_name = 'PHA';
 				this.addr_mode = 'implied';
 				if (this.opcode_cycle === 3) {
-					this.SP = (this.SP - 1) && 0x00ff;
+					this.SP = (this.SP - 1) & 0x00ff;
 					emulator.write_byte(0x0100 + this.SP, this.A);
 				}
 				break;
