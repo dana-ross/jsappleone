@@ -639,6 +639,10 @@ function CPU6502(emulator) {
 								break;
 							case 5:
 								this.addr_mode = 'zeropage,x';
+								if (this.opcode_cycle === 1) {
+									this.operand = emulator.read_byte(this.PC);
+									this.PC += 1;
+								}
 								break;
 							case 6:
 								this.addr_mode = 'absolute,y';
