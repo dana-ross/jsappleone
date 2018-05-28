@@ -705,6 +705,12 @@ function CPU6502(emulator) {
 											opcode_done = true;
 										}
 										break;
+									case 'zeropage,x':
+										if(this.opcode_cycle === 4) {
+											emulator.write_byte((this.operand + this.X) & 0x00ff, this.A);
+											opcode_done = true
+										}
+										break;
 									case 'absolute,y':
 										if (this.opcode_cycle === 5) {
 											emulator.write_byte(this.operand + this.Y, this.A);
