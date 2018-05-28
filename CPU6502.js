@@ -866,6 +866,30 @@ function CPU6502(emulator) {
 										this.invalidOpcodeMessage(bbb)
 								}
 								break
+							case 0b010:
+							this.opcode_name = 'LSR';
+								switch (this.addr_mode) {
+									case 'accumulator':
+										this.setc(this.A & 0x01);
+										this.A = this.A >> 1;
+										this.setz(this.A);
+										this.setc(this.A);
+										opcode_done = true;
+										break;
+									case 'zeropage':
+										this.invalidOpcodeMessage(bbb);
+										break;
+									case 'zeropage,x':
+										this.invalidOpcodeMessage(bbb);
+										break;
+									case 'absolute':
+										this.invalidOpcodeMessage(bbb);
+										break;
+									case 'absolute,x':
+										this.invalidOpcodeMessage(bbb);
+										break;
+								}
+								break;
 							case 4:
 								this.opcode_name = 'STX'
 								switch (this.addr_mode) {
