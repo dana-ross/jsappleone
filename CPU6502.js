@@ -237,7 +237,10 @@ function CPU6502(emulator) {
 			case 0x48:
 				this.opcode_name = 'PHA';
 				this.addr_mode = 'implied';
-				throw "Unimplemented opcode " + this.opcode_name;
+				if (this.opcode_cycle === 3) {
+					this.SP = (this.SP - 1) && 0x00ff;
+					emulator.write_byte(0x0100 + this.SP, this.A);
+				}
 				break;
 			case 0x68:
 				this.opcode_name = 'PLA';
