@@ -47,8 +47,6 @@
 					rom_data_high = new Uint8Array(req_high.response),
 					rom_data = new Uint8Array(256);
 
-				console.log(rom_data_low);
-				console.log(rom_data_high);
 				for(var i = 0; i < rom_data_low.length; i++) {
 					// console.log(rom_data_low[i] | rom_data_high[i] << 4);
 					rom_data[i] = rom_data_low[i] | rom_data_high[i] << 4;
