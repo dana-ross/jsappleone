@@ -749,6 +749,13 @@ function CPU6502(emulator) {
 											opcode_done = true;
 										}
 										break;
+									case 'zeropage':
+										if(this.opcode_cycle === 3) {
+											this.A = emulator.read_byte(this.operand)
+											this.set_nz(this.A)
+											opcode_done = true
+										}
+										break;
 									case 'zeropage,x':
 										if(this.opcode_cycle === 4) {
 											this.A = emulator.read_byte((this.operand + this.X) & 0x00ff)
