@@ -689,7 +689,7 @@ function CPU6502(emulator) {
 										this.A = (this.A & this.operand) & 0x00ff;
 										this.set_nz(this.A);
 										opcode_done = true;
-								break;
+										break;
 									default:
 										this.invalidOpcodeMessage(bbb);
 								}
