@@ -684,6 +684,15 @@ function CPU6502(emulator) {
 								break;
 							case 1:
 								this.opcode_name = 'AND';
+								switch(this.addr_mode) {
+									case 'immediate':
+										this.A = (this.A & this.operand) & 0x00ff;
+										this.set_nz(this.A);
+										opcode_done = true;
+								break;
+									default:
+										this.invalidOpcodeMessage(bbb);
+								}
 								break;
 							case 2:
 								this.opcode_name = 'EOR'
